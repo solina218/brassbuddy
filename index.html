@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brass Academy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+      <img src="logo.jpg" alt="Solina Logo" style="height: 40px; width: 40px; border-radius: 50%;">
+      Brass Academy
+    </div>
+    <nav>
+      <ul id="nav-menu">
+        <li><a data-target="home" class="active">Home</a></li>
+        <li><a data-target="charts">Charts</a></li>
+        <li><a data-target="metronome">Metronome</a></li>
+        <li><a data-target="sight-reading">Sight-Reading</a></li>
+        <li><a data-target="lessons">Practice Plan</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home" class="active">
+      <div class="hero glass-panel">
+        <h1>Welcome to Brass Academy!</h1>
+        <p>Your ultimate chill and motivational space to master the Euphonium and get ready to swing with the Trombone in jazz band.</p>
+        <button class="btn nav-btn" data-target="lessons">Start Today's Practice</button>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="card glass-panel nav-btn" data-target="charts">
+          <i class="fa-solid fa-list-ul"></i>
+          <h3>Fingering Charts</h3>
+          <p>Quickly look up 4-valve euphonium fingerings and trombone slide positions for any scale.</p>
+        </div>
+        <div class="card glass-panel nav-btn" data-target="metronome">
+          <i class="fa-solid fa-stopwatch"></i>
+          <h3>Metronome</h3>
+          <p>Keep your timing sharp with our interactive practice metronome.</p>
+        </div>
+        <div class="card glass-panel nav-btn" data-target="sight-reading">
+          <i class="fa-solid fa-book-open"></i>
+          <h3>Sight-Reading</h3>
+          <p>Practice reading new music to prepare for jazz band.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section id="charts">
+      <div class="hero glass-panel" style="padding: 2rem;">
+        <h2>Fingering & Slide Charts</h2>
+        <p>Select a scale below to see the fingerings and slide positions.</p>
+        
+        <div class="scale-selector-container">
+          <label for="scale-selector"><strong>Select Scale:</strong></label>
+          <select id="scale-selector" class="custom-select">
+            <option value="bb-major-1">Concert Bb Major (1 Octave)</option>
+            <option value="bb-major-2">Concert Bb Major (2 Octaves)</option>
+            <option value="f-major-1">Concert F Major (1 Octave)</option>
+            <option value="eb-major-1">Concert Eb Major (1 Octave)</option>
+            <option value="bb-blues">Bb Blues Scale (Jazz)</option>
+            <option value="bb-pentatonic">Bb Minor Pentatonic (Jazz)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-box glass-panel">
+          <h3><i class="fa-solid fa-music"></i> Fingerings & Positions</h3>
+          <div style="overflow-x: auto;">
+            <table class="chart-table">
+              <thead>
+                <tr>
+                  <th>Note</th>
+                  <th><i class="fa-solid fa-wind"></i> Euphonium (4-Valve)</th>
+                  <th><i class="fa-solid fa-arrows-left-right"></i> Trombone</th>
+                </tr>
+              </thead>
+              <tbody id="combined-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metronome Section -->
+    <section id="metronome">
+      <div class="metronome-container glass-panel">
+        <h2>Practice Metronome</h2>
+        <div class="bpm-display"><span id="bpm-value">120</span> <span style="font-size: 1.5rem;">BPM</span></div>
+        
+        <input type="range" min="40" max="240" value="120" class="bpm-slider" id="bpm-slider">
+        
+        <div class="metronome-controls">
+          <button class="control-btn" id="bpm-minus-10" title="Decrease BPM by 10">-10</button>
+          <button class="control-btn" id="bpm-minus" title="Decrease BPM"><i class="fa-solid fa-minus"></i></button>
+          <button class="control-btn" id="play-btn" title="Play/Pause"><i class="fa-solid fa-play"></i></button>
+          <button class="control-btn" id="bpm-plus" title="Increase BPM"><i class="fa-solid fa-plus"></i></button>
+          <button class="control-btn" id="bpm-plus-10" title="Increase BPM by 10">+10</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sight Reading Section -->
+    <section id="sight-reading">
+      <div class="hero glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+        <h2>Sight-Reading Library</h2>
+        <p>Select a piece from the library to practice, or upload your own sheet music.</p>
+        
+        <div class="library-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="beginner">Beginner</button>
+          <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+          <button class="filter-btn" data-filter="advanced">Advanced / Jazz</button>
+        </div>
+      </div>
+
+      <div class="library-grid" id="library-grid">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="sight-reading-tools">
+        <div class="upload-area glass-panel" id="upload-area">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <h3>Upload Your Own Music</h3>
+          <p>Click here or drag & drop an image of your sheet music</p>
+          <input type="file" id="file-input" accept="image/*">
+        </div>
+
+        <div class="sheet-music-display glass-panel" id="sheet-music-display" style="display:none;">
+          <button class="close-btn" id="close-music-btn"><i class="fa-solid fa-times"></i></button>
+          <img id="music-image" src="" alt="Sight reading sheet music">
+        </div>
+      </div>
+    </section>
+
+    <!-- Lessons Section -->
+    <section id="lessons">
+      <div class="hero glass-panel module-header" style="padding: 2rem;">
+        <h2 id="current-module-title">Module 1: Trombone Basics</h2>
+        <p id="current-module-desc">Let's get started with the fundamentals of your new instrument!</p>
+        
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="module-progress"></div>
+          </div>
+          <p id="module-status" class="progress-text">0 / 4 Tasks Completed</p>
+        </div>
+      </div>
+
+      <div class="lesson-plan glass-panel">
+        <div class="timeline" id="task-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <button id="complete-module-btn" class="btn" style="display:none; font-size: 1.3rem;">🎉 Finish Milestone & Unlock Next Module 🎉</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
