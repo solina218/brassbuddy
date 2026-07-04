@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let timerID;
   let nextNoteTime = 0.0;
   
+  // Advanced State
+  let currentBeat = 0;
+  let currentSubdivision = 0;
+  let measureCount = 0;
+  
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const bpmValue = document.getElementById('bpm-value');
   const bpmSlider = document.getElementById('bpm-slider');
@@ -38,6 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPlus = document.getElementById('bpm-plus');
   const btnPlus10 = document.getElementById('bpm-plus-10');
   const playBtn = document.getElementById('play-btn');
+  
+  // New UI Elements
+  const tapBtn = document.getElementById('tap-tempo-btn');
+  const timeSigSelect = document.getElementById('time-sig');
+  const subDivSelect = document.getElementById('subdivision');
+  const visualPulse = document.getElementById('visual-pulse');
+  const trainerToggle = document.getElementById('trainer-toggle');
+  const trainerTarget = document.getElementById('trainer-target');
+  const trainerMeasures = document.getElementById('trainer-measures');
+
+  let tapTimes = [];
 
   function updateBPMDisplay() {
     bpmValue.textContent = bpm;
@@ -49,32 +65,59 @@ document.addEventListener('DOMContentLoaded', () => {
     updateBPMDisplay();
   });
 
-  btnMinus10.addEventListener('click', () => {
-    bpm = Math.max(40, bpm - 10);
-    updateBPMDisplay();
-  });
+  btnMinus10.addEventListener('click', () => { bpm = Math.max(40, bpm - 10); updateBPMDisplay(); });
+  btnMinus.addEventListener('click', () => { if(bpm > 40) bpm--; updateBPMDisplay(); });
+  btnPlus.addEventListener('click', () => { if(bpm < 240) bpm++; updateBPMDisplay(); });
+  btnPlus10.addEventListener('click', () => { bpm = Math.min(240, bpm + 10); updateBPMDisplay(); });
 
-  btnMinus.addEventListener('click', () => {
-    if(bpm > 40) bpm--;
-    updateBPMDisplay();
-  });
-
-  btnPlus.addEventListener('click', () => {
-    if(bpm < 240) bpm++;
-    updateBPMDisplay();
-  });
-
-  btnPlus10.addEventListener('click', () => {
-    bpm = Math.min(240, bpm + 10);
-    updateBPMDisplay();
+  // Tap Tempo Logic
+  tapBtn.addEventListener('click', () => {
+    const now = performance.now();
+    tapTimes.push(now);
+    if (tapTimes.length > 5) tapTimes.shift();
+    
+    if (tapTimes.length >= 2) {
+      let sum = 0;
+      for (let i = 1; i < tapTimes.length; i++) {
+        sum += (tapTimes[i] - tapTimes[i-1]);
+      }
+      const avgMs = sum / (tapTimes.length - 1);
+      const calculatedBpm = Math.round(60000 / avgMs);
+      if (calculatedBpm >= 40 && calculatedBpm <= 240) {
+        bpm = calculatedBpm;
+        updateBPMDisplay();
+      } else {
+        tapTimes = [now]; // Reset if too slow
+      }
+    }
   });
 
   function scheduleNote() {
     while (nextNoteTime < audioContext.currentTime + 0.1) {
+      const timeSig = parseInt(timeSigSelect.value);
+      const subDivs = parseInt(subDivSelect.value); // 1=quarter, 2=eighth, 3=triplet, 4=sixteenth
+      
       const osc = audioContext.createOscillator();
       const envelope = audioContext.createGain();
       
-      osc.frequency.value = 800; 
+      if (currentSubdivision === 0) {
+        if (currentBeat === 0) {
+          osc.frequency.value = 1200; // Downbeat
+        } else {
+          osc.frequency.value = 800; // Normal beat
+        }
+        
+        // Trigger Visual Pulse on Main Beats
+        const timeToPlay = Math.max(0, nextNoteTime - audioContext.currentTime);
+        setTimeout(() => {
+          visualPulse.classList.remove('pulse-anim');
+          void visualPulse.offsetWidth; // trigger reflow
+          visualPulse.classList.add('pulse-anim');
+        }, timeToPlay * 1000);
+
+      } else {
+        osc.frequency.value = 400; // Subdivisions
+      }
       
       envelope.gain.setValueAtTime(1, nextNoteTime);
       envelope.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + 0.05);
@@ -85,8 +128,35 @@ document.addEventListener('DOMContentLoaded', () => {
       osc.start(nextNoteTime);
       osc.stop(nextNoteTime + 0.05);
       
+      // Calculate next time
       const secondsPerBeat = 60.0 / bpm;
-      nextNoteTime += secondsPerBeat;
+      nextNoteTime += (secondsPerBeat / subDivs);
+      
+      // Advance counters
+      currentSubdivision++;
+      if (currentSubdivision >= subDivs) {
+        currentSubdivision = 0;
+        currentBeat++;
+        
+        if (currentBeat >= timeSig) {
+          currentBeat = 0;
+          measureCount++;
+          
+          // Speed Trainer Logic
+          if (trainerToggle.checked) {
+            const targetBpm = parseInt(trainerTarget.value);
+            const measuresToWait = parseInt(trainerMeasures.value);
+            
+            if (measureCount >= measuresToWait) {
+              measureCount = 0;
+              if (bpm < targetBpm) {
+                bpm = Math.min(bpm + 2, targetBpm);
+                updateBPMDisplay();
+              }
+            }
+          }
+        }
+      }
     }
     timerID = setTimeout(scheduleNote, 25.0);
   }
@@ -95,6 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!isPlaying) {
       if (audioContext.state === 'suspended') audioContext.resume();
       isPlaying = true;
+      currentBeat = 0;
+      currentSubdivision = 0;
+      measureCount = 0;
       nextNoteTime = audioContext.currentTime + 0.05;
       scheduleNote();
       playBtn.classList.add('playing');
@@ -362,4 +435,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderModule();
+
+  // Spacebar mapping to Tap Tempo
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && e.target.tagName !== 'INPUT' && document.getElementById('metronome').classList.contains('active')) {
+      e.preventDefault();
+      if (!isPlaying) {
+        tapBtn.click();
+      } else {
+        playBtn.click();
+      }
+    }
+  });
 });

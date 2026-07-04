@@ -96,17 +96,60 @@
     <!-- Metronome Section -->
     <section id="metronome">
       <div class="metronome-container glass-panel">
-        <h2>Practice Metronome</h2>
-        <div class="bpm-display"><span id="bpm-value">120</span> <span style="font-size: 1.5rem;">BPM</span></div>
+        <h2>Advanced Metronome</h2>
         
-        <input type="range" min="40" max="240" value="120" class="bpm-slider" id="bpm-slider">
+        <div class="visual-pulse" id="visual-pulse">
+          <div class="bpm-display"><span id="bpm-value">120</span> <span style="font-size: 1.5rem;">BPM</span></div>
+        </div>
+        
+        <div class="metronome-main-controls">
+          <button class="btn" id="tap-tempo-btn"><i class="fa-solid fa-hand-pointer"></i> Tap</button>
+          <input type="range" min="40" max="240" value="120" class="bpm-slider" id="bpm-slider">
+        </div>
         
         <div class="metronome-controls">
           <button class="control-btn" id="bpm-minus-10" title="Decrease BPM by 10">-10</button>
           <button class="control-btn" id="bpm-minus" title="Decrease BPM"><i class="fa-solid fa-minus"></i></button>
-          <button class="control-btn" id="play-btn" title="Play/Pause"><i class="fa-solid fa-play"></i></button>
+          <button class="control-btn play-btn-large" id="play-btn" title="Play/Pause"><i class="fa-solid fa-play"></i></button>
           <button class="control-btn" id="bpm-plus" title="Increase BPM"><i class="fa-solid fa-plus"></i></button>
           <button class="control-btn" id="bpm-plus-10" title="Increase BPM by 10">+10</button>
+        </div>
+
+        <div class="advanced-settings-grid">
+          <div class="setting-group">
+            <label for="time-sig"><i class="fa-solid fa-hashtag"></i> Time Signature</label>
+            <select id="time-sig" class="custom-select">
+              <option value="4">4/4</option>
+              <option value="3">3/4</option>
+              <option value="2">2/4</option>
+              <option value="6">6/8</option>
+            </select>
+          </div>
+          
+          <div class="setting-group">
+            <label for="subdivision"><i class="fa-solid fa-music"></i> Subdivision</label>
+            <select id="subdivision" class="custom-select">
+              <option value="1">Quarter Notes</option>
+              <option value="2">Eighth Notes</option>
+              <option value="3">Triplets (Swing)</option>
+              <option value="4">Sixteenth Notes</option>
+            </select>
+          </div>
+
+          <div class="setting-group trainer-group" style="grid-column: 1 / -1;">
+            <label><i class="fa-solid fa-gauge-high"></i> Speed Trainer</label>
+            <div class="trainer-inputs" style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 10px;">
+              <label style="display:flex; align-items:center; gap:5px; margin-right:15px; cursor:pointer;">
+                <input type="checkbox" id="trainer-toggle" style="width:20px; height:20px;"> Enable
+              </label>
+              <span>Target:</span>
+              <input type="number" id="trainer-target" class="custom-select" style="width: 80px; padding: 0.5rem;" min="40" max="240" value="140">
+              <span>BPM</span>
+              <span style="margin-left: 10px;">Speed up every:</span>
+              <input type="number" id="trainer-measures" class="custom-select" style="width: 70px; padding: 0.5rem;" min="1" max="16" value="4">
+              <span>Measures</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
